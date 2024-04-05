@@ -24,4 +24,5 @@ for i in range(count_of_tasks):
     tasks.append(classes.Task(arrival_time, period, wcet, aet))
 
 # Algorithms.DVS.Run(cpu, tasks)
-DVS.DVS().Run(cpu, tasks)
+cpu.algo = DVS.DVS()
+cpu.algo.Run(cpu, tasks)

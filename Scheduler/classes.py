@@ -27,10 +27,10 @@ class states:
 
 
     def set_time_to_set(state: str, value: list[float]):
-        time_to_set[state] = value
+        states.time_to_set[state] = value
     
     def set_energy_consumption(state: str, value):
-        energy_consumption[state] = value
+        states.energy_consumption[state] = value
 
 
 class BaseAlgo:
@@ -40,21 +40,6 @@ class BaseAlgo:
     def Run(self, cpu, tasks):
         pass
 
-class Logger:
-    def __init__(self, cpu, msg):
-        self.time = time
-        self.cpu = cpu
-        self.msg = msg
-
-    def __str__(self):
-        return f'''
-        Log time: {self.time}
-        CPU:
-            frequency: {self.cpu.frequency},
-            Total consumption: {self.cpu.energy_consumption},
-            DPM: {'absent' if self.cpu.DPM == None else {'state': self.cpu.DPM.state, 'E-consumption': self.cpu.DPM.energy_consumption}}
-            queue: {cpu.queue}
-        '''
 
 class DPM:
 
@@ -71,26 +56,25 @@ class Task:
         self.WCET = WCET
         self.AET = AET
 
+    def deadline(self):
+        return self.arrival_time + self.period
 
-    # def __init__(self, task):
-    #     self.arrival_time = task.arrival_time
-    #     self.period = task.period
-    #     self.WCET = task.WCET
-    #     self.AET = task.AET
+    def __repr__(self, _ET, frequency):
+        return f"({self.arrival_time}->{_ET * frequency})"
+        
 
     def __str__(self):
         return f"({self.arrival_time}|{self.period}|{self.WCET}|{self.AET})"
     
-
 class CPU:
 
     def __init__(self, set_of_frequencies, enegry_consumption_by_frequency, has_DPM=False):
-        for key, value in zip(set_of_frequencies, enegry_consumption_by_frequency):
-            self.freq_energy[key] = value
-        self.frequency = self.freq_energy.keys()[-1]
-        # self.set_of_frequencies = set_of_frequencies
-        # self.enegry_consumption_by_frequency = enegry_consumption_by_frequency # alpha * C_L * V_dd^2
 
+        self.freq_energy = {}
+        for key, value in zip(set_of_frequencies, enegry_consumption_by_frequency):
+            self.freq_energy[key] = value # alpha * C_L * V_dd^2
+
+        self.frequency = sorted(self.freq_energy.keys())[-1]
         self.energy_consumption = 0
         self.queue = []
         self.DPM = DPM('ACTIVE') if has_DPM else None
@@ -98,12 +82,19 @@ class CPU:
         self.algo = None
     
     def Energy_func(self, execution_time):
-        return self.
+        return self.freq_energy[self.frequency]*execution_time
 
+    def GetFrequency(self, alpha):
+        for frequency in sorted(self.freq_energy.keys()):
+            if frequency >= alpha:
+                return frequency
 
-    def QueueStr(self):
-        for task in self.queue:
-            print(task, end = ' ')
+    def QueueStr(self, LOG=False, _ET='WCET'):
+        if LOG:
+            return ' '.join(task.__repr__(task.WCET if _ET=='WCET' else task.AET, self.frequency) for task in self.queue)
+        return ' '.join(task.__str__() for task in self.queue)
+        # for task in self.queue:
+        #     print(task, end = ' ')
 
     def sort_push_back(self, item, key: callable):
         place = 0
@@ -113,5 +104,24 @@ class CPU:
                 break
         self.queue.insert(place, item)
 
-    def LOG(msg):
-        algo.logs.append(Logger(self, msg))
+    def LOG(self, msg, _ET="WCET"):
+        self.algo.logs.append(Logger(self, msg, _ET))
+
+class Logger:
+    def __init__(self, cpu: CPU, msg, _ET='WCET'):
+        self.time = cpu.algo.time
+        self.cpu = cpu
+        self.msg = msg
+        self._ET = _ET
+
+    def __str__(self):
+        return f'''
+        Log time: {self.time}
+        CPU:
+            frequency: {self.cpu.frequency},
+            Total consumption: {self.cpu.energy_consumption},
+            DPM: {'absent' if self.cpu.DPM == None else {'state': self.cpu.DPM.state, 'E-consumption': self.cpu.DPM.energy_consumption}}
+            queue: {self.cpu.QueueStr(LOG=True, _ET=self._ET)}
+
+        Message: {self.msg}
+        '''
