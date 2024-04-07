@@ -1,3 +1,5 @@
+import copy
+
 class states:
     states = ['ACTIVE', 'IDLE', 'SLEEP']
     
@@ -55,18 +57,21 @@ class Task:
         self.period = period
         self.WCET = WCET
         self.AET = AET
+        self.execution_frequency = -1
+        self._ET = None
 
     def deadline(self):
         return self.arrival_time + self.period
 
-    def __repr__(self, _ET, frequency):
-        return f"({self.arrival_time}->{_ET * frequency})"
+    def __repr__(self):
+        return f"({self.arrival_time}->{self.arrival_time * (self.execution_frequency==None) + self._ET / self.execution_frequency})"
         
 
     def __str__(self):
         return f"({self.arrival_time}|{self.period}|{self.WCET}|{self.AET})"
     
 class CPU:
+    Simple_Queue = []
 
     def __init__(self, set_of_frequencies, enegry_consumption_by_frequency, has_DPM=False):
 
@@ -89,12 +94,20 @@ class CPU:
             if frequency >= alpha:
                 return frequency
 
+    # def QueueStr(self, LOG=False, _ET='WCET'):
+    #     if LOG:
+    #         return ' '.join(task.__repr__(task.WCET if _ET=='WCET' else task.AET) for task in self.queue)
+    #     return ' '.join(task.__str__() for task in self.queue)
+    #     # for task in self.queue:
+    #     #     print(task, end = ' ')
+
     def QueueStr(self, LOG=False, _ET='WCET'):
         if LOG:
-            return ' '.join(task.__repr__(task.WCET if _ET=='WCET' else task.AET, self.frequency) for task in self.queue)
-        return ' '.join(task.__str__() for task in self.queue)
+            return ' '.join(task.__repr__(task.WCET if _ET=='WCET' else task.AET) for task in CPU.Simple_Queue)
+        return ' '.join(task.__str__() for task in CPU.Simple_Queue)
         # for task in self.queue:
         #     print(task, end = ' ')
+
 
     def sort_push_back(self, item, key: callable):
         place = 0
@@ -105,13 +118,14 @@ class CPU:
         self.queue.insert(place, item)
 
     def LOG(self, msg, _ET="WCET"):
-        self.algo.logs.append(Logger(self, msg, _ET))
+        self.algo.logs.append(Logger(copy.deepcopy(self), msg, _ET))
 
 class Logger:
     def __init__(self, cpu: CPU, msg, _ET='WCET'):
         self.time = cpu.algo.time
         self.cpu = cpu
         self.msg = msg
+
         self._ET = _ET
 
     def __str__(self):

@@ -4,6 +4,13 @@ import sys
 
 if (sys.argv[1] and sys.argv[1] == '--test'):
     cpu = classes.CPU([0.25, 0.5, 1], [3, 5, 8], 0)
+    print(f'''
+    frequency <-> energy consumption per second
+          1.0 <-> 8
+          0.5 <-> 5
+          0.25 <-> 3
+    CPU without DPM
+    ''')
 else:
     set_of_frequencies = eval(input("set_of_frequencies(list): "))
     enegry_consumption_by_frequency = eval(input("enegry_consumption_by_frequency(list): "))
