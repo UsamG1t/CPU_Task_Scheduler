@@ -57,15 +57,16 @@ class Task:
         self.period = period
         self.WCET = WCET
         self.AET = AET
-        self.execution_frequency = -1
-        self._ET = None
-
+        self.execution_frequency = None
+        self.start_execution_time = None
+        self.execution_time = None
+        
     def deadline(self):
         return self.arrival_time + self.period
 
     def __repr__(self):
-        return f"({self.arrival_time}->{self.arrival_time * (self.execution_frequency==None) + self._ET / self.execution_frequency})"
-        
+        finish_execution_time = None if self.execution_time is None else self.start_execution_time + self.execution_time
+        return f"({self.start_execution_time}->{finish_execution_time})"
 
     def __str__(self):
         return f"({self.arrival_time}|{self.period}|{self.WCET}|{self.AET})"
@@ -85,28 +86,25 @@ class CPU:
         self.DPM = DPM('ACTIVE') if has_DPM else None
 
         self.algo = None
-    
+        self.time = 0
+
     def Energy_func(self, execution_time):
-        return self.freq_energy[self.frequency]*execution_time
+        return self.freq_energy[self.frequency] * execution_time
 
     def GetFrequency(self, alpha):
         for frequency in sorted(self.freq_energy.keys()):
             if frequency >= alpha:
                 return frequency
 
+    def QueueStr(self):
+        return ' '.join(task.__repr__() for task in self.queue)
+        
     # def QueueStr(self, LOG=False, _ET='WCET'):
     #     if LOG:
-    #         return ' '.join(task.__repr__(task.WCET if _ET=='WCET' else task.AET) for task in self.queue)
-    #     return ' '.join(task.__str__() for task in self.queue)
+    #         return ' '.join(task.__repr__(task.WCET if _ET=='WCET' else task.AET) for task in CPU.Simple_Queue)
+    #     return ' '.join(task.__str__() for task in CPU.Simple_Queue)
     #     # for task in self.queue:
     #     #     print(task, end = ' ')
-
-    def QueueStr(self, LOG=False, _ET='WCET'):
-        if LOG:
-            return ' '.join(task.__repr__(task.WCET if _ET=='WCET' else task.AET) for task in CPU.Simple_Queue)
-        return ' '.join(task.__str__() for task in CPU.Simple_Queue)
-        # for task in self.queue:
-        #     print(task, end = ' ')
 
 
     def sort_push_back(self, item, key: callable):
@@ -117,25 +115,34 @@ class CPU:
                 break
         self.queue.insert(place, item)
 
-    def LOG(self, msg, _ET="WCET"):
-        self.algo.logs.append(Logger(copy.deepcopy(self), msg, _ET))
-
-class Logger:
-    def __init__(self, cpu: CPU, msg, _ET='WCET'):
-        self.time = cpu.algo.time
-        self.cpu = cpu
-        self.msg = msg
-
-        self._ET = _ET
-
-    def __str__(self):
+    def LOG(self, msg):
         return f'''
         Log time: {self.time}
         CPU:
-            frequency: {self.cpu.frequency},
-            Total consumption: {self.cpu.energy_consumption},
-            DPM: {'absent' if self.cpu.DPM == None else {'state': self.cpu.DPM.state, 'E-consumption': self.cpu.DPM.energy_consumption}}
-            queue: {self.cpu.QueueStr(LOG=True, _ET=self._ET)}
+            frequency: {self.frequency},
+            Total consumption: {self.energy_consumption},
+            DPM: {'absent' if self.DPM == None else {'state': self.DPM.state, 'E-consumption': self.DPM.energy_consumption}}
+            queue: {self.QueueStr()}
 
-        Message: {self.msg}
+        Message: {msg}
         '''
+    
+# class Logger:
+#     def __init__(self, cpu: CPU, msg, _ET='WCET'):
+#         self.time = cpu.algo.time
+#         self.cpu = cpu
+#         self.msg = msg
+
+#         self._ET = _ET
+
+#     def __str__(self):
+#         return f'''
+#         Log time: {self.time}
+#         CPU:
+#             frequency: {self.cpu.frequency},
+#             Total consumption: {self.cpu.energy_consumption},
+#             DPM: {'absent' if self.cpu.DPM == None else {'state': self.cpu.DPM.state, 'E-consumption': self.cpu.DPM.energy_consumption}}
+#             queue: {self.cpu.QueueStr(LOG=True, _ET=self._ET)}
+
+#         Message: {self.msg}
+#         '''
