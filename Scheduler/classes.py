@@ -52,7 +52,10 @@ class DPM:
 
 
 class Task:
+    NUM = 0
     def __init__(self, arrival_time, period, WCET, AET):
+        self.num = Task.NUM
+        Task.NUM += 1
         self.arrival_time = arrival_time
         self.period = period
         self.WCET = WCET
@@ -66,7 +69,7 @@ class Task:
 
     def __repr__(self):
         finish_execution_time = None if self.execution_time is None else self.start_execution_time + self.execution_time
-        return f"({self.start_execution_time}->{finish_execution_time})"
+        return f"({self.num}: Freq {self.execution_frequency} time {self.start_execution_time}->{finish_execution_time})"
 
     def __str__(self):
         return f"({self.arrival_time}|{self.period}|{self.WCET}|{self.AET})"
@@ -98,14 +101,9 @@ class CPU:
 
     def QueueStr(self):
         return ' '.join(task.__repr__() for task in self.queue)
-        
-    # def QueueStr(self, LOG=False, _ET='WCET'):
-    #     if LOG:
-    #         return ' '.join(task.__repr__(task.WCET if _ET=='WCET' else task.AET) for task in CPU.Simple_Queue)
-    #     return ' '.join(task.__str__() for task in CPU.Simple_Queue)
-    #     # for task in self.queue:
-    #     #     print(task, end = ' ')
 
+    def QueueStrBase(self):
+        return ' '.join(task.__str__() for task in self.queue)
 
     def sort_push_back(self, item, key: callable):
         place = 0
