@@ -63,6 +63,7 @@ class Task:
         self.execution_frequency = None
         self.start_execution_time = None
         self.execution_time = None
+        self.priority = None
         
     def deadline(self):
         return self.arrival_time + self.period

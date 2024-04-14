@@ -2,7 +2,7 @@ from classes import Task, BaseAlgo, CPU
 from math import gcd
 import copy
 
-class DVS(BaseAlgo):
+class DVS_Priority(BaseAlgo):
     def Run(self, cpu: CPU, tasks: list[Task]):
         # create scm wcet schedule
         lcm = tasks[0].period
@@ -13,15 +13,48 @@ class DVS(BaseAlgo):
         for task in tasks:
             for i in range(0, lcm, task.period):
                 task.arrival_time = i
-                cpu.sort_push_back(copy.copy(task), key=lambda x: (x.arrival_time, x.arrival_time + x.period))
+                cpu.sort_push_back(copy.copy(task), key=lambda x: (x.arrival_time, x.priority, x.arrival_time + x.period))
                 
                 # sum_of_exec += task.WCET
+        i = 0
+        length = len(cpu.queue)
+        while i < length - 1:
+            interruption_search_start = cpu.queue[i].arrival_time + 1
+            preinterrupt_time_end = None
+            interrupt_shift = 0
+            interruption_search_end = cpu.queue[i].deadline()
+
+            inter_task = i + 1
+            current_time = interruption_search_start
+            while (current_time < interruption_search_end):
+                if cpu.queue[inter_task].arrival_time == current_time and cpu.queue[inter_task].priority < cpu.queue[i].priority:
+                    if preinterrupt_time_end is None:
+                        preinterrupt_time_end = current_time
+                    interrupt_shift += cpu.queue[inter_task].WCET
+                    inter_task += 1
+                    if inter_task == length:
+                        break
+                    current_time -= 1
+                current_time += 1
+
+            if preinterrupt_time_end is not None:
+                if (cpu.queue[i].arrival_time + cpu.queue[i].AET - preinterrupt_time_end > 0):
+                    cpu.sort_push_back(Task(arrival_time=preinterrupt_time_end + interrupt_shift,
+                                            period=cpu.queue[i].period,
+                                            WCET=cpu.queue[i].arrival_time + cpu.queue[i].WCET - preinterrupt_time_end,
+                                            AET=cpu.queue[i].arrival_time + cpu.queue[i].AET - preinterrupt_time_end),
+                                        key=lambda x: (x.arrival_time, x.priority, x.arrival_time + x.period))
+                cpu.queue[i].WCET = preinterrupt_time_end - cpu.queue[i].arrival_time
+                cpu.queue[i].AET = max([preinterrupt_time_end - cpu.queue[i].arrival_time, 0])
+            
+            length = len(cpu.queue)
+            i += 1
+
+            
 
         print(cpu.QueueStrBase())
-        # print(sum_of_exec)
         tasks = copy.deepcopy(cpu.queue)
         cpu.queue = []
-        # tasks = sorted(tasks, key=lambda x: (x.arrival_time, x.arrival_time + x.period))
         logs = []
 
         logs.append(cpu.LOG("Start work"))
