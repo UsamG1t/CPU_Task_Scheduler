@@ -78,6 +78,8 @@ class DVS_Priority(BaseAlgo):
             uncorrect_tasks = []
             while (unprocessed_tasks and 
                     cpu.time <= unprocessed_tasks[0].arrival_time <= end_searching_time):
+
+                
                 print('FIND ONE')
                 tasks_in_progress.append(copy.copy(unprocessed_tasks[0]))
                 if (searching_deadline == None or
