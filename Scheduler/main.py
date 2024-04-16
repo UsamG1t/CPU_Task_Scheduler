@@ -35,6 +35,6 @@ for i in range(count_of_tasks):
 
 # Algorithms.DVS.Run(cpu, tasks)
 cpu1.algo = DVS.DVS()
-cpu1.algo.Run(cpu1, tasks)
+cpu1.algo.Run(cpu1, copy.deepcopy(tasks))
 cpu2.algo = DVS_Priority.DVS_Priority()
-cpu2.algo.Run(cpu2, tasks)
+cpu2.algo.Run(cpu2, copy.deepcopy(tasks))
