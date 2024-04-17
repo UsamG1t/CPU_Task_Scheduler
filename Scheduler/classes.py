@@ -4,35 +4,40 @@ class states:
     states = ['ACTIVE', 'IDLE', 'SLEEP']
     
     time_to_set = {
-        'ACTIVE': [0, 0.5, 1],
-        'IDLE': [0.5, 0, 0.5],
-        'SLEEP': [1.5, 1, 0]
+        'ACTIVE': {'TO_ACTIVE': 0, 'TO_IDLE': 0.5, 'TO_SLEEP': 1},
+        'IDLE': {'TO_ACTIVE': 0.5, 'TO_IDLE': 0, 'TO_SLEEP': 0.5},
+        'SLEEP': {'TO_ACTIVE': 1.5, 'TO_IDLE': 1, 'TO_SLEEP': 0}
+    }
+
+    energy_to_set = {
+        'ACTIVE': {'TO_ACTIVE': 0, 'TO_IDLE': 15, 'TO_SLEEP': 12},
+        'IDLE': {'TO_ACTIVE': 15, 'TO_IDLE': 0, 'TO_SLEEP': 6},
+        'SLEEP': {'TO_ACTIVE': 8, 'TO_IDLE': 4, 'TO_SLEEP': 0}
     }
 
     energy_consumption = {
-        'ACTIVE': 40000,
-        'IDLE': 15000,
-        'SLEEP': 400
+        'ACTIVE': 40,
+        'IDLE': 20,
+        'SLEEP': 4
     }
 
     def __str__(self):
         result = []
-        for state in states:
+        for state in self.states:
             result.append(f'state {state}: {self.energy_consumption[state]} points of energy per second')
-            for state_to in states:
-                result.append(f'from {state} to ACTIVE: {self.time_to_set[state][0]}')
-                result.append(f'from {state} to IDLE: {self.time_to_set[state][1]}')
-                result.append(f'from {state} to SLEEP: {self.time_to_set[state][2]}')
+            result.append(f'from {state} to ACTIVE: {self.time_to_set[state]["TO_ACTIVE"]}')
+            result.append(f'from {state} to IDLE: {self.time_to_set[state]["TO_IDLE"]}')
+            result.append(f'from {state} to SLEEP: {self.time_to_set[state]["TO_SLEEP"]}')
             result.append('\n')
         
         return '\n'.join(result)
 
 
-    def set_time_to_set(state: str, value: list[float]):
-        states.time_to_set[state] = value
+    # def set_time_to_set(state: str, value: list[float]):
+    #     states.time_to_set[state] = value
     
-    def set_energy_consumption(state: str, value):
-        states.energy_consumption[state] = value
+    # def set_energy_consumption(state: str, value):
+    #     states.energy_consumption[state] = value
 
 
 class BaseAlgo:

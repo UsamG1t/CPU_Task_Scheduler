@@ -1,16 +1,20 @@
 import classes, copy
-from Algorithms import DVS, DVS_Priority
+from Algorithms import DVS, DVS_Priority, DVS_DPM
 import sys
 
 if (sys.argv[1] and sys.argv[1] == '--test'):
-    cpu1 = classes.CPU([0.25, 0.5, 1], [3, 5, 8], 0)
-    cpu2 = classes.CPU([0.25, 0.5, 1], [3, 5, 8], 0)
+    cpu1 = classes.CPU([0.25, 0.5, 1], [15, 25, 40], 0)
+    cpu2 = classes.CPU([0.25, 0.5, 1], [15, 25, 40], 0)
+    cpu3 = classes.CPU([0.25, 0.5, 1], [15, 25, 40], 1)
     print(f'''
     frequency <-> energy consumption per second
           1.0 <-> 8
           0.5 <-> 5
           0.25 <-> 3
     CPU without DPM
+    
+    CPU with DPM:
+        {classes.states().__str__()}
     ''')
 else:
     set_of_frequencies = eval(input("set_of_frequencies(list): "))
@@ -38,3 +42,6 @@ cpu1.algo = DVS.DVS()
 cpu1.algo.Run(cpu1, copy.deepcopy(tasks))
 cpu2.algo = DVS_Priority.DVS_Priority()
 cpu2.algo.Run(cpu2, copy.deepcopy(tasks))
+cpu3.algo = DVS_DPM.DVS_DPM()
+cpu3.algo.Run(cpu3, copy.deepcopy(tasks))
+
