@@ -89,4 +89,5 @@ class DVS(BaseAlgo):
                 cpu.time = searching_deadline
                 logs.append(cpu.LOG("Final schedule for period"))
 
-        print(*logs, sep='\n')
+        with open('DVS_logs.out', 'w') as file:
+            print(*logs, sep='\n', file=file)

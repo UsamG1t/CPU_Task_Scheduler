@@ -198,4 +198,6 @@ class DVS_DPM(BaseAlgo):
             logs.append(cpu.LOG(f"USE {'DPM' * (dpm) + 'DVS' * (not dpm)} STRATEGY"))
             
         logs.append(cpu.LOG("Final schedule for period"))
-        print(*logs, sep='\n')
+        
+        with open('DVS_DPM_logs.out', 'w') as file:
+            print(*logs, sep='\n', file=file)

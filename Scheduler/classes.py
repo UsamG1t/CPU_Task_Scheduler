@@ -4,21 +4,21 @@ class states:
     states = ['ACTIVE', 'IDLE', 'SLEEP']
     
     time_to_set = {
-        'ACTIVE': {'TO_ACTIVE': 0, 'TO_IDLE': 0.5, 'TO_SLEEP': 1},
-        'IDLE': {'TO_ACTIVE': 0.5, 'TO_IDLE': 0, 'TO_SLEEP': 0.5},
-        'SLEEP': {'TO_ACTIVE': 1.5, 'TO_IDLE': 1, 'TO_SLEEP': 0}
+        'ACTIVE': {'TO_ACTIVE': 0, 'TO_IDLE': 0.5, 'TO_SLEEP': 3},
+        'IDLE': {'TO_ACTIVE': 0.5, 'TO_IDLE': 0, 'TO_SLEEP': 3},
+        'SLEEP': {'TO_ACTIVE': 5, 'TO_IDLE': None, 'TO_SLEEP': 0}
     }
 
     energy_to_set = {
-        'ACTIVE': {'TO_ACTIVE': 0, 'TO_IDLE': 15, 'TO_SLEEP': 12},
-        'IDLE': {'TO_ACTIVE': 15, 'TO_IDLE': 0, 'TO_SLEEP': 6},
-        'SLEEP': {'TO_ACTIVE': 8, 'TO_IDLE': 4, 'TO_SLEEP': 0}
+        'ACTIVE': {'TO_ACTIVE': 0, 'TO_IDLE': 2, 'TO_SLEEP': 5},
+        'IDLE': {'TO_ACTIVE': 2, 'TO_IDLE': 0, 'TO_SLEEP': 5},
+        'SLEEP': {'TO_ACTIVE': 5, 'TO_IDLE': None, 'TO_SLEEP': 0}
     }
 
     energy_consumption = {
         'ACTIVE': 40,
-        'IDLE': 20,
-        'SLEEP': 4
+        'IDLE': 15,
+        'SLEEP': 2
     }
 
     def __str__(self):
@@ -41,7 +41,6 @@ class states:
 
 
 class BaseAlgo:
-    time = 0
     logs = []
 
     def Run(self, cpu, tasks):
@@ -130,23 +129,3 @@ class CPU:
 
         Message: {msg}
         '''
-    
-# class Logger:
-#     def __init__(self, cpu: CPU, msg, _ET='WCET'):
-#         self.time = cpu.algo.time
-#         self.cpu = cpu
-#         self.msg = msg
-
-#         self._ET = _ET
-
-#     def __str__(self):
-#         return f'''
-#         Log time: {self.time}
-#         CPU:
-#             frequency: {self.cpu.frequency},
-#             Total consumption: {self.cpu.energy_consumption},
-#             DPM: {'absent' if self.cpu.DPM == None else {'state': self.cpu.DPM.state, 'E-consumption': self.cpu.DPM.energy_consumption}}
-#             queue: {self.cpu.QueueStr(LOG=True, _ET=self._ET)}
-
-#         Message: {self.msg}
-#         '''
