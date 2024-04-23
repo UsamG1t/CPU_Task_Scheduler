@@ -19,7 +19,6 @@ class DVS_DPM(BaseAlgo):
                     # sum_of_exec += task.WCET
 
             print(cpu.QueueStrBase())
-            return
             # print(sum_of_exec)
             tasks = copy.deepcopy(cpu.queue)
             cpu.queue = []
@@ -64,10 +63,9 @@ class DVS_DPM(BaseAlgo):
 
                 DPM_cpu = copy.deepcopy(cpu)
                 DPM_tasks_in_progress = copy.deepcopy(tasks_in_progress)
-                need_to_compare = True
-
+                
                 logs.append(DPM_cpu.LOG("===========DPM=============="))
-                task_border = unprocessed_tasks[0].arrival_time + unprocessed_tasks[0].AET if len(unprocessed_tasks) else searching_deadline
+                task_border = DPM_tasks_in_progress[0].arrival_time + DPM_tasks_in_progress[0].AET if len(DPM_tasks_in_progress) else searching_deadline
                 tails = []
                 for task in DPM_tasks_in_progress[::-1]:
                     tail = min(task_border, task.deadline())
@@ -203,10 +201,15 @@ class DVS_DPM(BaseAlgo):
                 
             logs.append(cpu.LOG("Final schedule for period"))
             
-            with open('DVS_DPM_logs.out', 'w') as file:
+            with open('Results.out', 'a') as file:
+                print(f'DVS_DPM: {cpu.energy_consumption}', ' ', sep='\n', file=file)
+
+            with open('DVS_DPM_logs.out', 'a') as file:
                 print(logs[-1], sep='\n', file=file)
 
         except Exception as e:
-            with open('DVS_DPM_logs.out', 'w') as file:
+            with open('Results.out', 'a') as file:
+                print(f'DVS_DPM: BROKEN', ' ', sep='\n', file=file)
+            with open('DVS_DPM_logs.out', 'a') as file:
                 print("BROKEN SCHEDULE", file=file)
                 print(*logs, sep='\n', file=file)

@@ -59,7 +59,6 @@ class DVS_Priority(BaseAlgo):
                 i += 1
 
             print(cpu.QueueStrBase())
-            return
             tasks = copy.deepcopy(cpu.queue)
             cpu.queue = []
 
@@ -130,10 +129,15 @@ class DVS_Priority(BaseAlgo):
                     cpu.time = searching_deadline
                     logs.append(cpu.LOG("Final schedule for period"))
 
-            with open('DVS_Priority_logs.out', 'w') as file:
+            with open('Results.out', 'a') as file:
+                print(f'DVS_Priority: {cpu.energy_consumption}', sep='\n', file=file)
+
+            with open('DVS_Priority_logs.out', 'a') as file:
                 print(logs[-1], sep='\n', file=file)
 
         except Exception as e:
-            with open('DVS_Priority_logs.out', 'w') as file:
+            with open('Results.out', 'a') as file:
+                print(f'DVS_Priority: BROKEN', sep='\n', file=file)
+            with open('DVS_Priority_logs.out', 'a') as file:
                 print("BROKEN SCHEDULE", file=file)
                 print(*logs, sep='\n', file=file)

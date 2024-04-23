@@ -2,6 +2,12 @@ import classes, copy
 from Algorithms import DVS, DVS_Priority, DVS_DPM
 import sys
 
+def Percentize(tasks: list[classes.Task], percent: float) -> list[classes.Task]:
+    for task in tasks:
+        task.AET *= percent
+        task.WCET *= percent
+    return tasks
+
 if (sys.argv[1] and sys.argv[1] == '--test'):
     cpu1 = classes.CPU([0.25, 0.5, 1], [15, 25, 40], 0)
     cpu2 = classes.CPU([0.25, 0.5, 1], [15, 25, 40], 0)
@@ -37,12 +43,16 @@ elif sys.argv[1] == '--file':
                            enegry_consumption_by_frequency=enegry_consumption_by_frequency,
                            has_DPM=1)
         
-        count_of_tasks = int(file.readline())
         tasks = []
-        for i in range(count_of_tasks):
-            arrival_time, period, wcet, aet = eval(file.readline())
-            tasks.append(classes.Task(arrival_time, period, wcet, aet))
-            tasks[-1].priority = i
+        count_of_tasks = int(file.readline())
+        with open('Results.out', 'a') as res:
+            print("~~~~~~~~", count_of_tasks, sep = '\n', file=res)
+
+            for i in range(count_of_tasks):
+                arrival_time, period, wcet, aet = eval(file.readline())
+                print(arrival_time, period, wcet, aet, file=res)
+                tasks.append(classes.Task(arrival_time, period, wcet, aet))
+                tasks[-1].priority = i
 
 else:
     set_of_frequencies = eval(input("set_of_frequencies(list): "))
@@ -59,10 +69,21 @@ else:
         tasks.append(classes.Task(arrival_time, period, wcet, aet))
         tasks[-1].priority = i
 
-cpu1.algo = DVS.DVS()
-cpu1.algo.Run(cpu1, copy.deepcopy(tasks))
-cpu2.algo = DVS_Priority.DVS_Priority()
-cpu2.algo.Run(cpu2, copy.deepcopy(tasks))
-cpu3.algo = DVS_DPM.DVS_DPM()
-cpu3.algo.Run(cpu3, copy.deepcopy(tasks))
+
+for percent in [1, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3]:
+    percent_tasks = Percentize(copy.deepcopy(tasks), percent)
+    with open('Results.out', 'a') as file:
+        print(f'{100*percent}%', ' ', sep='\n', file=file)
+
+    cpuA = copy.deepcopy(cpu1)
+    cpuA.algo = DVS.DVS()
+    cpuA.algo.Run(cpuA, copy.deepcopy(percent_tasks))
+    
+    cpuB = copy.deepcopy(cpu2)
+    cpuB.algo = DVS_Priority.DVS_Priority()
+    cpuB.algo.Run(cpuB, copy.deepcopy(percent_tasks))
+    
+    cpuC = copy.deepcopy(cpu3)
+    cpuC.algo = DVS_DPM.DVS_DPM()
+    cpuC.algo.Run(cpuC, copy.deepcopy(percent_tasks))
 

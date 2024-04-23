@@ -4,15 +4,15 @@ class states:
     states = ['ACTIVE', 'IDLE', 'SLEEP']
     
     time_to_set = {
-        'ACTIVE': {'TO_ACTIVE': 0, 'TO_IDLE': 0.5, 'TO_SLEEP': 3},
-        'IDLE': {'TO_ACTIVE': 0.5, 'TO_IDLE': 0, 'TO_SLEEP': 3},
-        'SLEEP': {'TO_ACTIVE': 5, 'TO_IDLE': None, 'TO_SLEEP': 0}
+        'ACTIVE': {'TO_ACTIVE': 0, 'TO_IDLE': 4, 'TO_SLEEP': 9},
+        'IDLE': {'TO_ACTIVE': 4, 'TO_IDLE': 0, 'TO_SLEEP': 9},
+        'SLEEP': {'TO_ACTIVE': 36, 'TO_IDLE': None, 'TO_SLEEP': 0}
     }
 
     energy_to_set = {
-        'ACTIVE': {'TO_ACTIVE': 0, 'TO_IDLE': 2, 'TO_SLEEP': 5},
-        'IDLE': {'TO_ACTIVE': 2, 'TO_IDLE': 0, 'TO_SLEEP': 5},
-        'SLEEP': {'TO_ACTIVE': 5, 'TO_IDLE': None, 'TO_SLEEP': 0}
+        'ACTIVE': {'TO_ACTIVE': 0, 'TO_IDLE': 550, 'TO_SLEEP': 1890},
+        'IDLE': {'TO_ACTIVE': 550, 'TO_IDLE': 0, 'TO_SLEEP': 425},
+        'SLEEP': {'TO_ACTIVE': 7560, 'TO_IDLE': None, 'TO_SLEEP': 0}
     }
 
     energy_consumption = {
