@@ -100,8 +100,14 @@ class DVS_Priority(BaseAlgo):
                 unprocessed_tasks = uncorrect_tasks + unprocessed_tasks
             
                 while len(tasks_in_progress):
-                    frequency_decreasing_coefficient = (end_searching_time - cpu.time) / (searching_deadline - cpu.time)
+                    if (searching_deadline == cpu.time):
+                        frequency_decreasing_coefficient = 1
+                    else:
+                        frequency_decreasing_coefficient = (end_searching_time - cpu.time) / (searching_deadline - cpu.time)
                     cpu.frequency = cpu.GetFrequency(frequency_decreasing_coefficient)
+    
+                    if cpu.frequency is None:
+                        cpu.frequency = 1
                     cpu.queue.append(copy.copy(tasks_in_progress[0]))
                     del tasks_in_progress[0]
 
@@ -138,4 +144,5 @@ class DVS_Priority(BaseAlgo):
                 print(f'DVS_Priority: BROKEN', sep='\n', file=file)
             with open('DVS_Priority_logs.out', 'a') as file:
                 print("BROKEN SCHEDULE", file=file)
-                print(*logs, sep='\n', file=file)
+                print(e, file=file)
+                # print(*logs, sep='\n', file=file)

@@ -33,20 +33,9 @@ class DVS(BaseAlgo):
             tasks_in_progress = []
             
             while len(unprocessed_tasks):
-                # print(f"COUNT OF TASKS {len(unprocessed_tasks)}")
-                # for task in unprocessed_tasks:
-                #     if cpu.time <= task.arrival_time <= end_searching_time:
-                #         tasks_in_progress.append(copy.copy(task))
-                #         end_searching_time += task.WCET
-                #         searching_deadline = task.deadline() if searching_deadline == None or task.deadline() < searching_deadline else searching_deadline
-                #         unprocessed_tasks.remove(task)
-
-                #     else:
-                #         break
                 uncorrect_tasks = []
                 while (unprocessed_tasks and 
                         cpu.time <= unprocessed_tasks[0].arrival_time <= end_searching_time):
-                    # print('FIND ONE')
                     tasks_in_progress.append(copy.copy(unprocessed_tasks[0]))
                     if (searching_deadline == None or
                             unprocessed_tasks[0].deadline() < searching_deadline):
@@ -62,9 +51,14 @@ class DVS(BaseAlgo):
                 unprocessed_tasks = uncorrect_tasks + unprocessed_tasks
             
                 while len(tasks_in_progress):
-                    frequency_decreasing_coefficient = (end_searching_time - cpu.time) / (searching_deadline - cpu.time)
+                    if (searching_deadline == cpu.time):
+                        frequency_decreasing_coefficient = 1
+                    else:
+                        frequency_decreasing_coefficient = (end_searching_time - cpu.time) / (searching_deadline - cpu.time)
                     cpu.frequency = cpu.GetFrequency(frequency_decreasing_coefficient)
-                    # print(f"frequency for {len(tasks_in_progress)} tasks == {cpu.frequency}")
+    
+                    if cpu.frequency is None:
+                        cpu.frequency = 1
                     cpu.queue.append(copy.copy(tasks_in_progress[0]))
                     del tasks_in_progress[0]
 
@@ -102,4 +96,5 @@ class DVS(BaseAlgo):
                 print(f'DVS: BROKEN', sep='\n', file=file)
             with open('DVS_logs.out', 'a') as file:
                 print("BROKEN SCHEDULE", file=file)
+                print(e, file=file)
                 print(*logs, sep='\n', file=file)

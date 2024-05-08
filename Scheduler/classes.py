@@ -1,5 +1,3 @@
-import copy
-
 class states:
     states = ['ACTIVE', 'IDLE', 'SLEEP']
     

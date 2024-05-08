@@ -160,9 +160,14 @@ class DVS_DPM(BaseAlgo):
                 try:
                     logs.append(cpu.LOG("===========DVS=============="))
                     while len(tasks_in_progress):
-                        frequency_decreasing_coefficient = (end_searching_time - cpu.time) / (searching_deadline - cpu.time)
+                        if (searching_deadline == cpu.time):
+                            frequency_decreasing_coefficient = 1
+                        else:
+                            frequency_decreasing_coefficient = (end_searching_time - cpu.time) / (searching_deadline - cpu.time)
                         cpu.frequency = cpu.GetFrequency(frequency_decreasing_coefficient)
-                        # print(f"frequency for {len(tasks_in_progress)} tasks == {cpu.frequency}")
+        
+                        if cpu.frequency is None:
+                            cpu.frequency = 1
                         cpu.queue.append(copy.copy(tasks_in_progress[0]))
                         del tasks_in_progress[0]
 
