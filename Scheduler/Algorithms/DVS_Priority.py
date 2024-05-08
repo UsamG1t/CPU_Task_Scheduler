@@ -33,7 +33,7 @@ class DVS_Priority(BaseAlgo):
                 current_time = interruption_search_start
                 while (current_wcet > 0 and current_time < interruption_search_end):
                     if cpu.queue[inter_task].arrival_time == current_time and cpu.queue[inter_task].priority < cpu.queue[i].priority:
-                        print(f"FIND on time {current_time}")
+                        # print(f"FIND on time {current_time}")
                         if preinterrupt_time_end is None:
                             preinterrupt_time_end = current_time
                         interrupt_shift += cpu.queue[inter_task].WCET
@@ -70,22 +70,21 @@ class DVS_Priority(BaseAlgo):
             tasks_in_progress = []
             
             while len(unprocessed_tasks):
-                print(f"COUNT OF TASKS {len(unprocessed_tasks)}")
-                # for task in unprocessed_tasks:
-                #     if cpu.time <= task.arrival_time <= end_searching_time:
-                #         tasks_in_progress.append(copy.copy(task))
-                #         end_searching_time += task.WCET
-                #         searching_deadline = task.deadline() if searching_deadline == None or task.deadline() < searching_deadline else searching_deadline
-                #         unprocessed_tasks.remove(task)
+                # print(f"COUNT OF TASKS {len(unprocessed_tasks)}")
+            #   
+                for task in unprocessed_tasks:
+                    if cpu.time <= task.arrival_time <= end_searching_time:
+                        tasks_in_progress.append(copy.copy(task))
+                        end_searching_time += task.WCET
+                        searching_deadline = task.deadline() if searching_deadline == None or task.deadline() < searching_deadline else searching_deadline
+                        unprocessed_tasks.remove(task)
 
-                #     else:
-                #         break
+                    else:
+                        break
+            # 
                 uncorrect_tasks = []
                 while (unprocessed_tasks and 
                         cpu.time <= unprocessed_tasks[0].arrival_time <= end_searching_time):
-
-                    
-                    print('FIND ONE')
                     tasks_in_progress.append(copy.copy(unprocessed_tasks[0]))
                     if (searching_deadline == None or
                             unprocessed_tasks[0].deadline() < searching_deadline):
@@ -103,7 +102,6 @@ class DVS_Priority(BaseAlgo):
                 while len(tasks_in_progress):
                     frequency_decreasing_coefficient = (end_searching_time - cpu.time) / (searching_deadline - cpu.time)
                     cpu.frequency = cpu.GetFrequency(frequency_decreasing_coefficient)
-                    print(f"frequency for {len(tasks_in_progress)} tasks == {cpu.frequency}")
                     cpu.queue.append(copy.copy(tasks_in_progress[0]))
                     del tasks_in_progress[0]
 

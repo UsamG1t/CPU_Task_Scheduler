@@ -4,8 +4,8 @@ import sys
 
 def Percentize(tasks: list[classes.Task], percent: float) -> list[classes.Task]:
     for task in tasks:
-        task.AET *= percent
-        task.WCET *= percent
+        task.AET = round(task.AET * percent, 2)
+        task.WCET = round(task.WCET * percent, 2)
     return tasks
 
 if (sys.argv[1] and sys.argv[1] == '--test'):
