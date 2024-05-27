@@ -30,14 +30,6 @@ class states:
         
         return '\n'.join(result)
 
-
-    # def set_time_to_set(state: str, value: list[float]):
-    #     states.time_to_set[state] = value
-    
-    # def set_energy_consumption(state: str, value):
-    #     states.energy_consumption[state] = value
-
-
 class BaseAlgo:
     logs = []
 

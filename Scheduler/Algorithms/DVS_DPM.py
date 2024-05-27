@@ -3,7 +3,7 @@ from math import gcd
 import copy
 
 class DVS_DPM(BaseAlgo):
-    def Run(self, cpu: CPU, tasks: list[Task]):
+    def Run(self, cpu: CPU, tasks: list[Task], energy_consumption, energy_to_set):
         try:
             # create scm wcet schedule
             lcm = tasks[0].period
@@ -18,6 +18,7 @@ class DVS_DPM(BaseAlgo):
                     
                     # sum_of_exec += task.WCET
 
+            print('DVS_DPM')
             print(cpu.QueueStrBase())
             # print(sum_of_exec)
             tasks = copy.deepcopy(cpu.queue)
@@ -79,7 +80,7 @@ class DVS_DPM(BaseAlgo):
 
                         logs.append(DPM_cpu.LOG("Use sleep mode"))
                         
-                        DPM_cpu.energy_consumption += states.energy_to_set['ACTIVE']['TO_SLEEP']
+                        DPM_cpu.energy_consumption += energy_to_set['ACTIVE']['TO_SLEEP']
                         DPM_cpu.DPM = DPM('SLEEP')
                         DPM_cpu.queue.append(f"ACTIVE->SLEEP: {DPM_cpu.time}->{DPM_cpu.time + states.time_to_set['ACTIVE']['TO_SLEEP']}")
                         DPM_cpu.time += states.time_to_set['ACTIVE']['TO_SLEEP']
@@ -87,10 +88,10 @@ class DVS_DPM(BaseAlgo):
 
                         DPM_cpu.queue.append(f'SLEEP MODE: {DPM_cpu.time}->{DPM_cpu.time + sleeping_time}')
                         DPM_cpu.time += sleeping_time
-                        DPM_cpu.energy_consumption += sleeping_time * states.energy_consumption['SLEEP']
+                        DPM_cpu.energy_consumption += sleeping_time * energy_consumption['SLEEP']
                         logs.append(DPM_cpu.LOG("Sleep mode"))
 
-                        DPM_cpu.energy_consumption += states.energy_to_set['SLEEP']['TO_ACTIVE']
+                        DPM_cpu.energy_consumption += energy_to_set['SLEEP']['TO_ACTIVE']
                         DPM_cpu.DPM = DPM('ACTIVE')
                         DPM_cpu.queue.append(f"SLEEP->ACTIVE: {DPM_cpu.time}->{DPM_cpu.time + states.time_to_set['SLEEP']['TO_ACTIVE']}")
                         DPM_cpu.time += states.time_to_set['SLEEP']['TO_ACTIVE']
@@ -100,7 +101,7 @@ class DVS_DPM(BaseAlgo):
                         DPM_cpu.queue[-1].start_execution_time = DPM_cpu.time
                         DPM_cpu.queue[-1].execution_time = DPM_cpu.queue[-1].AET
                         DPM_cpu.time += DPM_cpu.queue[-1].execution_time
-                        DPM_cpu.energy_consumption += states.energy_consumption['ACTIVE'] * DPM_cpu.queue[-1].execution_time
+                        DPM_cpu.energy_consumption += energy_consumption['ACTIVE'] * DPM_cpu.queue[-1].execution_time
                         logs.append(DPM_cpu.LOG("Execute Task"))
 
                         tails.pop()
@@ -110,7 +111,7 @@ class DVS_DPM(BaseAlgo):
 
                         logs.append(DPM_cpu.LOG("Use idle mode"))
                         
-                        DPM_cpu.energy_consumption += states.energy_to_set['ACTIVE']['TO_IDLE']
+                        DPM_cpu.energy_consumption += energy_to_set['ACTIVE']['TO_IDLE']
                         DPM_cpu.DPM = DPM('IDLE')
                         DPM_cpu.queue.append(f"ACTIVE->IDLE: {DPM_cpu.time}->{DPM_cpu.time + states.time_to_set['ACTIVE']['TO_IDLE']}")
                         DPM_cpu.time += states.time_to_set['ACTIVE']['TO_IDLE']
@@ -118,10 +119,10 @@ class DVS_DPM(BaseAlgo):
 
                         DPM_cpu.queue.append(f'IDLE MODE: {DPM_cpu.time}->{DPM_cpu.time + idleing_time}')
                         DPM_cpu.time += idleing_time
-                        DPM_cpu.energy_consumption += idleing_time * states.energy_consumption['IDLE']
+                        DPM_cpu.energy_consumption += idleing_time * energy_consumption['IDLE']
                         logs.append(DPM_cpu.LOG("Idle mode"))
 
-                        DPM_cpu.energy_consumption += states.energy_to_set['IDLE']['TO_ACTIVE']
+                        DPM_cpu.energy_consumption += energy_to_set['IDLE']['TO_ACTIVE']
                         DPM_cpu.DPM = DPM('ACTIVE')
                         DPM_cpu.queue.append(f"IDLE->ACTIVE: {DPM_cpu.time}->{DPM_cpu.time + states.time_to_set['IDLE']['TO_ACTIVE']}")
                         DPM_cpu.time += states.time_to_set['IDLE']['TO_ACTIVE']
@@ -131,7 +132,7 @@ class DVS_DPM(BaseAlgo):
                         DPM_cpu.queue[-1].start_execution_time = DPM_cpu.time
                         DPM_cpu.queue[-1].execution_time = DPM_cpu.queue[-1].AET
                         DPM_cpu.time += DPM_cpu.queue[-1].execution_time
-                        DPM_cpu.energy_consumption += states.energy_consumption['ACTIVE'] * DPM_cpu.queue[-1].execution_time
+                        DPM_cpu.energy_consumption += energy_consumption['ACTIVE'] * DPM_cpu.queue[-1].execution_time
                         logs.append(DPM_cpu.LOG("Execute Task"))
 
                         tails.pop()
@@ -143,7 +144,7 @@ class DVS_DPM(BaseAlgo):
                         
                         DPM_cpu.queue.append(f'ACTIVE MODE: {DPM_cpu.time}->{DPM_cpu.time + wait_time}')
                         DPM_cpu.time += wait_time
-                        DPM_cpu.energy_consumption += wait_time * states.energy_consumption['ACTIVE']
+                        DPM_cpu.energy_consumption += wait_time * energy_consumption['ACTIVE']
                         logs.append(DPM_cpu.LOG("Active mode"))
 
                         DPM_cpu.queue.append(copy.copy(DPM_tasks_in_progress[0]))
@@ -152,7 +153,7 @@ class DVS_DPM(BaseAlgo):
                         DPM_cpu.queue[-1].execution_time = DPM_cpu.queue[-1].AET
                         # print('~', DPM_cpu.queue[-1].execution_time, '~')
                         DPM_cpu.time += DPM_cpu.queue[-1].execution_time
-                        DPM_cpu.energy_consumption += states.energy_consumption['ACTIVE'] * DPM_cpu.queue[-1].execution_time
+                        DPM_cpu.energy_consumption += energy_consumption['ACTIVE'] * DPM_cpu.queue[-1].execution_time
                         logs.append(DPM_cpu.LOG("Execute Task"))
 
                         tails.pop()
@@ -206,15 +207,29 @@ class DVS_DPM(BaseAlgo):
                 
             logs.append(cpu.LOG("Final schedule for period"))
             
-            with open('Results.out', 'a') as file:
+            with open('Results_param.out', 'a') as file:
                 print(f'DVS_DPM: {cpu.energy_consumption}', ' ', sep='\n', file=file)
 
             with open('DVS_DPM_logs.out', 'a') as file:
                 print(logs[-1], sep='\n', file=file)
 
         except Exception as e:
-            with open('Results.out', 'a') as file:
+            with open('Results_param.out', 'a') as file:
                 print(f'DVS_DPM: BROKEN', ' ', sep='\n', file=file)
             with open('DVS_DPM_logs.out', 'a') as file:
                 print("BROKEN SCHEDULE", file=file)
                 print(*logs, sep='\n', file=file)
+
+                            
+        #     with open('Results.out', 'a') as file:
+        #         print(f'DVS_DPM: {cpu.energy_consumption}', ' ', sep='\n', file=file)
+
+        #     with open('DVS_DPM_logs.out', 'a') as file:
+        #         print(logs[-1], sep='\n', file=file)
+
+        # except Exception as e:
+        #     with open('Results.out', 'a') as file:
+        #         print(f'DVS_DPM: BROKEN', ' ', sep='\n', file=file)
+        #     with open('DVS_DPM_logs.out', 'a') as file:
+        #         print("BROKEN SCHEDULE", file=file)
+        #         print(*logs, sep='\n', file=file)

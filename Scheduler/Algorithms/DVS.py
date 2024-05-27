@@ -18,12 +18,22 @@ class DVS(BaseAlgo):
                     
                     # sum_of_exec += task.WCET
 
+            print("DVS")
             print(cpu.QueueStrBase())
             # print(sum_of_exec)
             tasks = copy.deepcopy(cpu.queue)
             cpu.queue = []
             # tasks = sorted(tasks, key=lambda x: (x.arrival_time, x.arrival_time + x.period))
             logs = []
+
+###############################################################
+            with open('Results_param.out', 'a') as file:
+                max_freq_consumption = 0
+                for task in tasks:
+                    max_freq_consumption +=cpu.Energy_func(task.AET)
+                print(f'Max Frequency Schedule: {max_freq_consumption}', sep='\n', file=file)
+            
+###############################################################
 
             logs.append(cpu.LOG("Start work"))
 
@@ -85,16 +95,32 @@ class DVS(BaseAlgo):
                     logs.append(cpu.LOG("Final schedule for period"))
 
 
-            with open('Results.out', 'a') as file:
+            with open('Results_param.out', 'a') as file:
                 print(f'DVS: {cpu.energy_consumption}', sep='\n', file=file)
             
             with open('DVS_logs.out', 'a') as file:
                 print(logs[-1], sep='\n', file=file)
                 
         except Exception as e:
-            with open('Results.out', 'a') as file:
+            with open('Results_param.out', 'a') as file:
                 print(f'DVS: BROKEN', sep='\n', file=file)
             with open('DVS_logs.out', 'a') as file:
                 print("BROKEN SCHEDULE", file=file)
                 print(e, file=file)
                 print(*logs, sep='\n', file=file)
+
+
+
+        #     with open('Results.out', 'a') as file:
+        #         print(f'DVS: {cpu.energy_consumption}', sep='\n', file=file)
+            
+        #     with open('DVS_logs.out', 'a') as file:
+        #         print(logs[-1], sep='\n', file=file)
+                
+        # except Exception as e:
+        #     with open('Results.out', 'a') as file:
+        #         print(f'DVS: BROKEN', sep='\n', file=file)
+        #     with open('DVS_logs.out', 'a') as file:
+        #         print("BROKEN SCHEDULE", file=file)
+        #         print(e, file=file)
+        #         print(*logs, sep='\n', file=file)
